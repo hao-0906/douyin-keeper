@@ -20,9 +20,11 @@ from core import automation, ledger, scheduler
 from core.config import DATA_DIR, DEFAULT_CONFIG, load_config, save_config
 from core.harvester import creator_map
 from core.runtime import (
+    load_harvest_last,
     load_runtime,
     recent_logs,
     record_contacts,
+    record_harvest,
     record_run,
     set_running,
     setup_logging,
@@ -32,12 +34,13 @@ from core.runtime import (
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 STATE_PATH = DATA_DIR / "state.json"
+PID_PATH = DATA_DIR / "server.pid"  # 单实例锁文件：防旧实例 scheduler 残留再发消息
 
 logger = setup_logging()
 run_lock = threading.Lock()
 contacts_fetching = False
 harvesting = False
-harvest_last = None
+# harvest_last 现从 runtime.json 持久化读取（服务重启后采集摘要不丢）
 
 
 # ── 环境变量 ──────────────────────────────────────────────────────────────
@@ -148,7 +151,8 @@ def _start_fetch_contacts() -> None:
 
 
 def _start_harvest_creator() -> None:
-    global harvesting, harvest_last
+    """后台线程执行 creator 抖音号采集 + 台账合并（只读，不发送消息）。"""
+    global harvesting
     if harvesting:
         raise HTTPException(status_code=409, detail="creator 采集已在进行中")
     if run_lock.locked():
@@ -156,7 +160,7 @@ def _start_harvest_creator() -> None:
     harvesting = True
 
     def worker() -> None:
-        global harvesting, harvest_last
+        global harvesting
         try:
             res = creator_map.collect_short_id_map()
             merge_stats = None
@@ -168,8 +172,9 @@ def _start_harvest_creator() -> None:
                              merge_stats["total"])
             harvest_last = {
                 "at": res.get("at"), "count": res.get("count"),
-                "error": res.get("error"), "merge": merge_stats,
+                "hit": res.get("hit"), "error": res.get("error"), "merge": merge_stats,
             }
+            record_harvest(harvest_last)
         finally:
             harvesting = False
 
@@ -186,18 +191,85 @@ def _scheduled_harvest() -> None:
 # ── FastAPI ────────────────────────────────────────────────────────────────
 
 
+def _pid_alive(pid: int) -> bool:
+    """检查 PID 对应的进程是否仍在运行（跨平台）。
+
+    Windows 上 os.kill(pid, 0) 抛 WinError 87（不是 ProcessLookupError），
+    故改用 tasklist；POSIX 用 os.kill(pid, 0)。
+    """
+    if os.name == "nt":  # Windows
+        try:
+            import subprocess
+            r = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"],
+                capture_output=True, text=True, timeout=5,
+            )
+            return str(pid) in r.stdout and "python" in r.stdout.lower()
+        except Exception:
+            return False
+    # POSIX
+    try:
+        os.kill(pid, 0)  # signal 0 = 探测进程是否存在，不实际发信号
+    except ProcessLookupError:
+        return False  # 进程不存在
+    except PermissionError:
+        return True  # 进程存在但无权限发信号
+    except OSError:
+        return False
+    return True
+
+
+def _acquire_instance_lock() -> None:
+    """单实例自检：若已有活跃实例运行则拒绝启动，防旧实例 scheduler 残留再发消息。
+
+    曾发生僵尸 python 进程导致定时超发。此锁确保同一时刻只有一个 sparkkeeper 实例
+    持有调度器，避免多实例重复触发发送任务。
+    """
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if PID_PATH.exists():
+        try:
+            old_pid = int(PID_PATH.read_text().strip())
+        except (ValueError, OSError):
+            old_pid = None
+        if old_pid and _pid_alive(old_pid):
+            logger.error(
+                "检测到已有 sparkkeeper 实例在运行（PID %s），拒绝启动。"
+                "请先停止旧实例再重试，避免多实例重复发送。",
+                old_pid,
+            )
+            raise SystemExit(f"已有实例在运行（PID {old_pid}），请先停止旧实例")
+        else:
+            logger.info("发现旧 PID 文件但进程已退出（PID %s），可安全接管", old_pid)
+    PID_PATH.write_text(str(os.getpid()), encoding="utf-8")
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    _acquire_instance_lock()
     try:
         scheduler.configure(lambda: _start_run(False), harvest_func=_scheduled_harvest)
     except Exception as e:
         logger.warning("调度器启动失败: %s", e)
     yield
     scheduler.shutdown()
+    try:
+        PID_PATH.unlink(missing_ok=True)
+    except Exception:
+        pass
 
 
 app = FastAPI(title="Douyin Spark Keeper", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.middleware("http")
+async def _no_cache_static(request, call_next):
+    """禁缓存：杜绝预览/浏览器缓存旧版 HTML（如缺少二次确认框的旧版）误触真实发送。"""
+    response = await call_next(request)
+    if request.url.path.startswith("/static/") or request.url.path == "/":
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+    return response
 
 
 # ── 请求体模型 ────────────────────────────────────────────────────────────
@@ -237,7 +309,10 @@ class LedgerBody(BaseModel):
 
 @app.get("/")
 def index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(
+        STATIC_DIR / "index.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"},
+    )
 
 
 @app.get("/api/health")
@@ -292,6 +367,7 @@ def api_ledger(token: str = Header(default="", alias="X-Auth-Token")) -> dict:
     _check_auth(token)
     rt = load_runtime()
     entries = ledger.load_ledger()
+    b_daily = rt.get("b_channel_daily") or {}
     return {
         "entries": entries,
         "selected_count": sum(1 for e in entries if e.get("selected")),
@@ -303,7 +379,11 @@ def api_ledger(token: str = Header(default="", alias="X-Auth-Token")) -> dict:
         "contacts_error": rt.get("contacts_error"),
         "fetching": contacts_fetching,
         "harvesting": harvesting,
-        "harvest_last": harvest_last,
+        "harvest_last": load_harvest_last(),
+        "b_channel_daily": {
+            "date": b_daily.get("date"),
+            "count": b_daily.get("count", 0),
+        },
     }
 
 

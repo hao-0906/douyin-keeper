@@ -79,6 +79,21 @@ def update_runtime(**fields) -> None:
     _save(rt)
 
 
+def record_harvest(harvest_last: dict | None) -> None:
+    """持久化最近一次 creator 采集摘要，服务重启后不丢（台账数据本身持久化不受影响）。"""
+    rt = load_runtime()
+    if harvest_last is None:
+        rt.pop("harvest_last", None)
+    else:
+        rt["harvest_last"] = harvest_last
+    _save(rt)
+
+
+def load_harvest_last() -> dict | None:
+    """读取持久化的采集摘要；无记录返回 None。"""
+    return load_runtime().get("harvest_last")
+
+
 class RingHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:

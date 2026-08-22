@@ -424,6 +424,12 @@
               <div class="stat-label">待发送</div>
               <div class="stat-value">{{ pendingSendCount }}<span style="font-size:12px;color:var(--km-text-3);"> 人</span></div>
             </div>
+            <div class="stat-card" :title="bChannelTooltip">
+              <div class="stat-label">首条消息额度</div>
+              <div class="stat-value" :style="{ color: bChannelOver ? '#8f5c5c' : '' }">
+                {{ bChannelCount }}<span style="font-size:12px;color:var(--km-text-3);"> / {{ bChannelLimit }} 条</span>
+              </div>
+            </div>
           </section>
 
           <!-- 概览 -->
@@ -708,6 +714,16 @@
           if (!pendingSend.value.length) return '暂无待发送（勾选后自动更新）';
           return pendingSend.value.map((p) => p.display_name + (p.send_channel === 'creator' ? '（creator）' : '')).join('、');
         });
+        // 通道 B（首条消息）额度可视化：今日已发 N/M + 超发警示
+        const bChannelDaily = ref({ date: null, count: 0 });
+        const bChannelCount = computed(() => bChannelDaily.value.count || 0);
+        const bChannelLimit = computed(() => config.first_message_daily_limit || 1);
+        const bChannelOver = computed(() => bChannelCount.value >= bChannelLimit.value);
+        const bChannelTooltip = computed(() => {
+          if (!settingsForm.allow_first_message) return '通道 B 已关闭（「允许首条消息」未开启）';
+          if (bChannelOver.value) return `今日已发 ${bChannelCount.value}/${bChannelLimit.value} 条，超发后将跳过`;
+          return `今日已发 ${bChannelCount.value}/${bChannelLimit.value} 条（每日跨天重置）`;
+        });
         function ledgerRowClass({ row }) {
           return row.no_consumer_conversation ? 'creator-only-row' : '';
         }
@@ -784,6 +800,7 @@
             ledgerError.value = r.data.contacts_error || '';
             harvesting.value = !!r.data.harvesting;
             harvestLast.value = r.data.harvest_last || null;
+            bChannelDaily.value = r.data.b_channel_daily || { date: null, count: 0 };
             ledgerChanged.value = false;
           } catch (e) { /* handled */ }
         }
@@ -974,6 +991,7 @@
           contacts, contactsAt, contactsError, contactsFetching,
           ledger, ledgerSorted, ledgerAt, ledgerError, ledgerChanged, manualName, ledgerSelectedCount, ledgerCreatorOnlyCount, ledgerNoConvCount,
           pendingSend, pendingSendCount, pendingSendNames,
+          bChannelDaily, bChannelCount, bChannelLimit, bChannelOver, bChannelTooltip,
           ledgerRowClass,
           harvestConfirm, harvesting, harvestLast, harvestDays,
           tokenDialog, tokenInput, showTokenDialog, saveToken,
