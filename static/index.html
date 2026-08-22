@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>抖音续火花助手</title>
+  <link rel="stylesheet" href="/static/vendor/element-plus.css" />
+  <style>
+    /* ========== Korean Minimal tokens ========== */
+    :root {
+      --km-bg: #faf9f7;
+      --km-card: #ffffff;
+      --km-text: #3d4a5c;
+      --km-text-2: rgba(61, 74, 92, 0.7);
+      --km-text-3: rgba(61, 74, 92, 0.5);
+      --km-border: rgba(61, 74, 92, 0.1);
+      --km-blush: #c9918f;
+      --km-sage: #a8c5b8;
+      --km-sand: #e8d4b8;
+      --km-radius: 1rem;
+      --km-shadow-sm: 0 1px 3px rgba(61, 74, 92, 0.05), 0 6px 20px rgba(61, 74, 92, 0.08);
+      --km-shadow-lift: 0 6px 16px rgba(61, 74, 92, 0.1), 0 14px 36px rgba(61, 74, 92, 0.09);
+      --km-ease: ease-in-out;
+
+      /* Element Plus 主题覆写：韩式极简配色 */
+      --el-color-primary: #3d4a5c;
+      --el-color-primary-light-3: #767f8b;
+      --el-color-primary-light-5: #9ca2aa;
+      --el-color-primary-light-7: #c1c5c9;
+      --el-color-primary-light-8: #d4d6d8;
+      --el-color-primary-light-9: #e7e8e8;
+      --el-color-primary-dark-2: #313b4a;
+      --el-color-success: #a8c5b8;
+      --el-color-success-light-3: #c1d5cb;
+      --el-color-success-light-5: #d1dfd8;
+      --el-color-success-light-7: #d9e4de;
+      --el-color-success-light-8: #eaeff1;
+      --el-color-success-light-9: #f2f4f1;
+      --el-color-success-dark-2: #869e93;
+      --el-color-warning: #e8d4b8;
+      --el-color-warning-light-3: #eddfcb;
+      --el-color-warning-light-5: #f1e7d8;
+      --el-color-warning-light-7: #f3eade;
+      --el-color-warning-light-8: #f6f2ea;
+      --el-color-warning-light-9: #f8f5f1;
+      --el-color-warning-dark-2: #baaa93;
+      --el-color-danger: #d4a5a5;
+      --el-color-danger-light-3: #dfbebe;
+      --el-color-danger-light-5: #e7cfce;
+      --el-color-danger-light-7: #ebd7d6;
+      --el-color-danger-light-8: #f2e8e7;
+      --el-color-danger-light-9: #f6f1ef;
+      --el-color-danger-dark-2: #aa8484;
+      --el-border-radius-base: 1rem;
+      --el-border-radius-small: 0.75rem;
+      --el-text-color-primary: #3d4a5c;
+      --el-text-color-regular: #57647a;
+      --el-text-color-secondary: #7c8591;
+      --el-text-color-placeholder: #9aa1ab;
+      --el-border-color: rgba(61, 74, 92, 0.12);
+      --el-border-color-light: rgba(61, 74, 92, 0.1);
+      --el-border-color-lighter: rgba(61, 74, 92, 0.08);
+      --el-border-color-extra-light: rgba(61, 74, 92, 0.06);
+      --el-fill-color-light: #faf9f7;
+      --el-fill-color-lighter: #faf9f7;
+      --el-bg-color: #ffffff;
+      --el-bg-color-page: #faf9f7;
+      --el-dialog-border-radius: 1.25rem;
+      --el-font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 55% 45% at 18% 8%, rgba(168, 197, 184, 0.5), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 84% 18%, rgba(212, 165, 165, 0.42), transparent 70%),
+        radial-gradient(ellipse 65% 55% at 50% 92%, rgba(232, 212, 184, 0.45), transparent 72%);
+      filter: blur(22px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    html { scrollbar-gutter: stable; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background-color: #bfc5cc;
+      color: var(--km-text);
+      font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== 图标 ========== */
+    .icon { display: inline-flex; align-items: center; justify-content: center; line-height: 0; vertical-align: middle; }
+    .icon svg { width: 1em; height: 1em; }
+    .icon-lg svg { width: 22px; height: 22px; }
+    .icon-btn svg { width: 15px; height: 15px; }
+    .icon-sm svg { width: 12px; height: 12px; }
+    .nav-icon svg { width: 17px; height: 17px; }
+    .icon-btn { margin-right: 6px; }
+
+    /* ========== 顶部（温暖白 + 细边框） ========== */
+    .topbar { background: transparent; border-bottom: none; position: relative; z-index: 1; }
+    .topbar-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-logo { color: var(--km-blush); }
+    .brand-text h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      line-height: 1.3;
+      color: var(--km-text);
+    }
+    .brand-text p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--km-text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar-tags { display: flex; align-items: center; gap: 10px; }
+    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    /* ========== 状态条 ========== */
+    .app { max-width: 72rem; margin: 0 auto; padding: 24px 24px 72px; position: relative; z-index: 1; }
+    .status-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--km-border);
+      border-radius: var(--km-radius);
+      box-shadow: var(--km-shadow-sm);
+      padding: 16px 20px;
+      text-align: left;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--km-shadow-lift); }
+    .stat-label { font-size: 11px; letter-spacing: 0.08em; color: var(--km-text-3); margin-bottom: 6px; }
+    .stat-value { font-size: 22px; font-weight: 400; letter-spacing: 0.03em; color: var(--km-text); font-variant-numeric: tabular-nums; }
+
+    /* ========== 布局骨架 ========== */
+    .shell { display: grid; position: relative; z-index: 1; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
+    .side-nav { display: flex; flex-direction: row; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--km-radius);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--km-text-2);
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: left;
+      transition: all 0.4s var(--km-ease);
+    }
+    .nav-item:hover {
+      background: #ffffff;
+      color: var(--km-text);
+      transform: translateY(-1px);
+      box-shadow: var(--km-shadow-sm);
+      border-color: var(--km-border);
+    }
+    .nav-item.active {
+      background: #ffffff;
+      border: 1px solid rgba(212,165,165,0.35);
+      color: var(--km-text);
+      font-weight: 400;
+    }
+
+    .main { min-width: 0; }
+    .main > section {
+      min-width: 0;
+      animation: km-fade-up 0.45s var(--km-ease) both;
+    }
+    @keyframes km-fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--km-border);
+      border-radius: var(--km-radius);
+      box-shadow: var(--km-shadow-sm);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      text-align: left;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--km-shadow-lift); }
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--km-text);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .card h2 .meta { font-size: 12px; font-weight: 400; color: var(--km-text-3); letter-spacing: 0.02em; }
+    .card h3 { margin: 0 0 10px; font-size: 15px; font-weight: 400; letter-spacing: 0.06em; color: var(--km-text); }
+    .hint { margin: 12px 0 0; font-size: 12px; font-weight: 400; color: var(--km-text-2); line-height: 1.8; }
+
+    .action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .result-line { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .result-label { font-size: 13px; font-weight: 400; line-height: 24px; letter-spacing: 0.03em; }
+    .label-ok { color: #55796a; }
+    .label-fail { color: #8f5c5c; }
+
+    .contact-box {
+      margin-top: 16px;
+      border: 1px solid var(--km-border);
+      border-radius: var(--km-radius);
+      padding: 14px 18px;
+      max-height: 260px;
+      overflow: auto;
+      background: #ffffff;
+    }
+    .ledger-box { max-height: 460px; padding: 8px 6px; }
+    .ledger-box .el-table { --el-table-header-bg-color: #faf9f7; --el-table-row-hover-bg-color: rgba(212,165,165,0.06); }
+    /* creator-only 行标灰：consumer 无会话，勾选默认不会被通道 A 发送 */
+    .ledger-box .creator-only-row { opacity: 0.5; }
+    .ledger-box .creator-only-row td { color: var(--km-text-3); }
+    .mini-fire { color: var(--km-blush); margin-right: 4px; }
+
+    /* ========== 日志终端（浅色） ========== */
+    .log-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .log-pre {
+      background: #1e1c1a;
+      color: #d4d0c8;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 18px 20px;
+      border-radius: var(--km-radius);
+      height: 420px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    /* ========== Element Plus 细节 token ========== */
+    .el-button {
+      border-radius: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      transition: all 0.3s var(--km-ease);
+      box-shadow: none;
+    }
+    .el-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(61, 74, 92, 0.1); }
+    .el-button:active { transform: translateY(0); box-shadow: none; }
+    .el-button--primary {
+      --el-button-bg-color: #3d4a5c;
+      --el-button-border-color: #3d4a5c;
+      --el-button-text-color: #faf9f7;
+      --el-button-hover-bg-color: #55657a;
+      --el-button-hover-border-color: #55657a;
+      --el-button-active-bg-color: #313b4a;
+      --el-button-active-border-color: #313b4a;
+    }
+    .el-button--success {
+      --el-button-bg-color: #a8c5b8;
+      --el-button-border-color: #a8c5b8;
+      --el-button-text-color: #3d4a5c;
+      --el-button-hover-bg-color: #bcd3c9;
+      --el-button-hover-border-color: #bcd3c9;
+      --el-button-active-bg-color: #869e93;
+      --el-button-active-border-color: #869e93;
+    }
+    .el-button--default {
+      --el-button-bg-color: #ffffff;
+      --el-button-border-color: rgba(61, 74, 92, 0.15);
+      --el-button-text-color: #3d4a5c;
+      --el-button-hover-bg-color: rgba(212, 165, 165, 0.06);
+      --el-button-hover-border-color: rgba(61, 74, 92, 0.25);
+      --el-button-hover-text-color: #3d4a5c;
+      --el-button-active-bg-color: rgba(61, 74, 92, 0.06);
+      --el-button-active-border-color: rgba(61, 74, 92, 0.2);
+    }
+
+    .el-input__wrapper,
+    .el-textarea__inner {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 0 0 1px rgba(61, 74, 92, 0.1) inset;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: box-shadow 0.3s var(--km-ease), background-color 0.3s var(--km-ease);
+    }
+    .el-input__wrapper.is-focus,
+    .el-textarea__inner:focus {
+      background-color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(212, 165, 165, 0.5) inset, 0 0 0 3px rgba(212, 165, 165, 0.1);
+    }
+
+    .el-tag { border-radius: 999px; letter-spacing: 0.02em; }
+    .el-tag--success { background: #f2f4f1; border-color: #d9e4de; color: #3d4a5c; }
+    .el-tag--warning { background: #f8f5f1; border-color: #f3eade; color: #3d4a5c; }
+    .el-tag--danger { background: #f6f1ef; border-color: #ebd7d6; color: #3d4a5c; }
+    .el-tag--info { background: #e7e8e8; border-color: #d4d6d8; color: #3d4a5c; }
+
+    .el-checkbox__inner { border-radius: 4px; border-color: rgba(61, 74, 92, 0.25); }
+    .el-checkbox__label { font-weight: 400; letter-spacing: 0.02em; color: var(--km-text); }
+
+    .el-alert { border-radius: 1rem; }
+    .el-alert__title { color: #3d4a5c !important; font-weight: 400; letter-spacing: 0.03em; }
+    .el-dialog { box-shadow: var(--km-shadow-lift); background: #ffffff; }
+
+    /* ========== 响应式 ========== */
+    @media (min-width: 768px) {
+      .status-strip { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+      .stat-card { padding: 20px 24px; }
+      .card { padding: 24px 28px; }
+      .card h2 { font-size: 19px; }
+      .side-nav { flex-direction: column; }
+    }
+    @media (min-width: 768px) {
+      .shell { grid-template-columns: 190px minmax(0, 1fr); }
+    }
+    @media (max-width: 767px) {
+      .brand-text p { display: none; }
+      .el-button { min-height: 40px; }
+      .nav-item { min-height: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+      .stat-card:hover, .card:hover, .nav-item:hover, .el-button:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航 -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-logo icon icon-lg" v-html="ICONS.fire" aria-hidden="true"></span>
+          <div class="brand-text">
+            <h1>抖音续火花助手</h1>
+            <p>Douyin Streak Keeper · 好友火花自动续期服务</p>
+          </div>
+        </div>
+        <div class="topbar-tags">
+          <el-tag :type="sessionTag.type">{{ sessionTag.text }}</el-tag>
+          <el-tag v-if="status.running" type="warning">运行中…</el-tag>
+        </div>
+        <div class="topbar-actions">
+          <el-button size="small" @click="loadAll"><span class="icon icon-btn" v-html="ICONS.reload"></span>刷新</el-button>
+          <el-button size="small" @click="showTokenDialog"><span class="icon icon-btn" v-html="ICONS.key"></span>令牌</el-button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app">
+      <!-- 左导航 + 主内容 -->
+      <div class="shell">
+        <nav class="side-nav" aria-label="功能导航">
+          <button
+            v-for="item in navItems"
+            :key="item.name"
+            type="button"
+            class="nav-item"
+            :class="{ active: tab === item.name }"
+            @click="tab = item.name"
+          >
+            <span class="icon nav-icon" v-html="ICONS[item.icon]" aria-hidden="true"></span>
+            <span>{{ item.label }}</span>
+          </button>
+        </nav>
+
+        <main class="main">
+          <!-- 状态条（仅概览页显示，置于内容列内，切换页签时左侧导航不跳动） -->
+          <section class="status-strip" aria-label="运行状态" v-show="tab === 'overview'">
+            <div class="stat-card">
+              <div class="stat-label">登录凭证</div>
+              <div class="stat-value">{{ status.state_file_exists ? '已就绪' : '未就绪' }}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">运行状态</div>
+              <div class="stat-value">{{ status.running ? '运行中' : '空闲' }}</div>
+            </div>
+            <div class="stat-card" title="自动发送总开关：关闭后定时任务跳过，仅手动「立即续火花」触发">
+              <div class="stat-label">自动续火花</div>
+              <div class="stat-value" :style="{ color: settingsForm.auto_run_enabled ? '' : '#8f5c5c' }">{{ settingsForm.auto_run_enabled ? '运行中' : '已关闭' }}</div>
+            </div>
+            <div class="stat-card" title="每天定时发送时间（自动运行关闭时不会触发）">
+              <div class="stat-label">下次自动续火花</div>
+              <div class="stat-value">{{ settingsForm.auto_run_enabled ? (fmt(status.next_run) || '未设置') : '已暂停' }}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">累计执行次数</div>
+              <div class="stat-value">{{ status.history_count }}</div>
+            </div>
+            <div class="stat-card" :title="pendingSendNames">
+              <div class="stat-label">待发送</div>
+              <div class="stat-value">{{ pendingSendCount }}<span style="font-size:12px;color:var(--km-text-3);"> 人</span></div>
+            </div>
+          </section>
+
+          <!-- 概览 -->
+          <section v-show="tab === 'overview'">
+            <div class="card">
+              <h2>快捷操作</h2>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+                <span style="display:inline-flex;align-items:center;gap:8px;">
+                  <el-switch v-model="settingsForm.auto_run_enabled" @change="saveSettings" active-text="自动续火花" inactive-text="已关闭"></el-switch>
+                  <span style="font-size:12px;color:var(--km-text-3);">关闭后定时任务不再自动发送；「立即续火花」手动触发不受影响</span>
+                </span>
+                <span style="display:inline-flex;align-items:center;gap:8px;">
+                  <el-switch v-model="settingsForm.allow_first_message" @change="saveSettings" active-text="允许首条消息" inactive-text="已关闭"></el-switch>
+                  <span style="font-size:12px;color:#8f5c5c;">对无会话好友（灰行）通过 creator 通道发首条消息（高风险，单日 ≤{{ config.first_message_daily_limit || 1 }} 条）</span>
+                </span>
+              </div>
+              <div class="action-row">
+                <el-button type="primary" size="large" :loading="status.running" @click="triggerRun(false)"><span class="icon icon-btn" v-html="ICONS.play"></span>立即续火花</el-button>
+                <el-button size="large" :loading="status.running" @click="triggerRun(true)"><span class="icon icon-btn" v-html="ICONS.experiment"></span>模拟运行（不实际续火花）</el-button>
+                <el-upload
+                  :auto-upload="false"
+                  :limit="1"
+                  accept=".json"
+                  :on-change="onFileChange"
+                  :on-remove="onFileRemove"
+                  style="display:inline-block;">
+                  <el-button><span class="icon icon-btn" v-html="ICONS.upload"></span>选择 State 文件</el-button>
+                </el-upload>
+                <el-button type="success" :disabled="!uploadFile" @click="uploadState"><span class="icon icon-btn" v-html="ICONS.cloudUpload"></span>上传登录凭证</el-button>
+              </div>
+              <p class="hint">登录凭证通过本机 extract_cookie.py 扫码获取，上传后服务即可自动执行续火花任务。首次使用前请完成凭证上传。</p>
+            </div>
+
+            <div class="card" v-if="status.last_run">
+              <h2>上次执行
+                <span class="meta">{{ fmt(status.last_run.at) }}<template v-if="status.last_run.dry_run">（干跑）</template></span>
+              </h2>
+              <div class="result-line">
+                <span class="result-label label-ok">成功 {{ status.last_run.ok.length }} 人：</span>
+                <el-tag v-for="n in status.last_run.ok" :key="n" size="small" type="success" style="margin:2px;">{{ n }}</el-tag>
+              </div>
+              <div class="result-line">
+                <span class="result-label label-fail">失败 {{ status.last_run.failed.length }} 人：</span>
+                <el-tooltip v-for="f in status.last_run.failed" :key="f.name" :content="f.reason" placement="top">
+                  <el-tag size="small" type="danger" style="margin:2px;">{{ f.name }}</el-tag>
+                </el-tooltip>
+              </div>
+              <div class="result-line" v-if="status.last_run.skipped && status.last_run.skipped.length">
+                <span class="result-label">跳过 {{ status.last_run.skipped.length }} 人：</span>
+                <el-tooltip v-for="s in status.last_run.skipped" :key="s.name" :content="s.reason" placement="top">
+                  <el-tag size="small" type="info" style="margin:2px;">{{ s.name }}</el-tag>
+                </el-tooltip>
+              </div>
+              <el-alert v-if="status.last_run.logged_out" type="error" :closable="false" style="margin-top:12px;"
+                title="登录凭证已过期：请在本机重新运行 extract_cookie.py 获取新凭证并上传"></el-alert>
+              <el-alert v-else-if="status.last_run.rate_limited" type="warning" :closable="false" style="margin-top:12px;"
+                title="触发限流保护：本轮已暂停，后续定时任务将自动补发"></el-alert>
+            </div>
+          </section>
+
+          <!-- 好友与消息 -->
+          <section v-show="tab === 'friends'">
+            <div class="card">
+              <h2>好友台账
+                <span class="meta">共 {{ ledger.length }} 人 · 已勾选 {{ ledgerSelectedCount }} 人<template v-if="ledgerAt"> · 最近同步 {{ fmt(ledgerAt) }}</template></span>
+              </h2>
+              <div class="action-row">
+                <el-button type="primary" :loading="contactsFetching" @click="fetchContacts"><span class="icon icon-btn" v-html="ICONS.contacts"></span>同步联系人</el-button>
+                <el-button type="warning" :loading="harvesting" @click="harvestConfirm = true"><span class="icon icon-btn" v-html="ICONS.cloudUpload"></span>采集抖音号</el-button>
+                <el-button type="success" :disabled="!ledgerChanged" @click="saveLedgerSelection"><span class="icon icon-btn" v-html="ICONS.save"></span>保存勾选</el-button>
+                <el-input v-model="manualName" placeholder="手动添加好友（显示名/昵称）" style="width:220px;" clearable @keyup.enter="addManual"></el-input>
+                <el-button :disabled="!manualName.trim()" @click="addManual">添加</el-button>
+              </div>
+              <p class="hint" v-if="harvestLast" style="margin-top:12px;">
+                最近采集：{{ fmt(harvestLast.at) }} · {{ harvestLast.count }} 条映射<template v-if="harvestLast.merge"> · join {{ harvestLast.merge.joined }} 人 / 新增 {{ harvestLast.merge.added }} 人</template><template v-if="harvestLast.error"> · 失败：{{ harvestLast.error }}</template>
+              </p>
+              <p class="hint" v-if="ledgerError" style="color:#8f5c5c;margin-top:12px;">获取失败：{{ ledgerError }}，可手动添加好友后保存勾选。</p>
+              <p class="hint" v-else-if="!ledger.length">台账为空：点击「同步联系人」从抖音聊天列表拉取（含火花天数），或手动添加好友后保存勾选。勾选即续火花目标。</p>
+              <p class="hint" v-if="ledger.length && ledgerNoConvCount" style="margin-top:12px;color:var(--km-text-2);">灰行 = consumer 私信无会话（自动识别，勾选默认跳过，不会被通道 A 发送）；如需发送请开启「允许首条消息」走通道 B。</p>
+              <div class="contact-box ledger-box" v-if="ledger.length">
+                <el-table :data="ledgerSorted" size="small" style="width:100%" :row-class-name="ledgerRowClass">
+                  <el-table-column label="勾选" width="64">
+                    <template #default="{ row }">
+                      <el-checkbox v-model="row.selected" @change="onSelectChange(row)"></el-checkbox>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="display_name" label="显示名" min-width="150"></el-table-column>
+                  <el-table-column label="抖音号" min-width="120">
+                    <template #default="{ row }">{{ row.short_id || '—' }}</template>
+                  </el-table-column>
+                  <el-table-column label="昵称" min-width="120">
+                    <template #default="{ row }">
+                      <template v-if="row.nickname && row.nickname !== row.display_name">{{ row.nickname }}</template>
+                      <span v-else style="color:var(--km-text-3);">同显示名</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="火花天数" width="100">
+                    <template #default="{ row }">
+                      <template v-if="row.streak_days"><span class="icon mini-fire" v-html="ICONS.fire"></span>{{ row.streak_days }} 天</template>
+                      <span v-else style="color:var(--km-text-3);">—</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="置信度" width="80">
+                    <template #default="{ row }">
+                      <el-tag :type="row.join_confidence === 'high' ? 'success' : 'info'" size="small">{{ row.join_confidence === 'high' ? '高' : '低' }}</el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="通道" width="110">
+                    <template #default="{ row }">
+                      <el-tag v-if="row.creator_only" type="warning" size="small" title="creator-only：consumer 私信无会话，勾选默认跳过（通道 B 默认关闭）">creator 仅</el-tag>
+                      <el-tag v-else-if="row.no_consumer_conversation" type="info" size="small" title="consumer 私信无会话，勾选默认跳过">无会话</el-tag>
+                      <el-tag v-else :type="row.channel === 'consumer' ? 'success' : 'info'" size="small">{{ row.channel }}</el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="最后续火花" width="180">
+                    <template #default="{ row }">{{ fmt(row.last_sent_at) || '从未' }}</template>
+                  </el-table-column>
+                  <el-table-column label="会话" width="100">
+                    <template #default="{ row }">
+                      <el-tag v-if="row.creator_only" type="warning" size="small" title="无 consumer 私信会话">无（creator）</el-tag>
+                      <el-tag v-else :type="row.no_consumer_conversation ? 'warning' : 'success'" size="small">{{ row.has_conversation ? '有' : '无' }}</el-tag>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </div>
+
+            <el-dialog v-model="harvestConfirm" title="采集抖音号" width="440px">
+              <p style="margin:0 0 12px;line-height:1.8;color:var(--km-text-2);">将打开创作者中心好友列表，滚动采集全部好友的抖音号（拦截 user_detail 接口，<b>只读、不发送消息</b>），约需 1～2 分钟。</p>
+              <p style="margin:0;line-height:1.8;color:var(--km-text-2);">采集频率建议：每周 1 次或手动触发，避免频繁操作触发风控。</p>
+              <template #footer>
+                <el-button @click="harvestConfirm = false">取消</el-button>
+                <el-button type="warning" :loading="harvesting" @click="startHarvest">开始采集</el-button>
+              </template>
+            </el-dialog>
+
+            <div class="card">
+              <h2>消息模板
+                <span class="meta">每次从模板中随机选取一条用于续火花</span>
+              </h2>
+              <el-form label-width="110px">
+                <el-form-item label="消息模板">
+                  <el-input v-model="messagesText" type="textarea" :rows="6"
+                    placeholder="每行一条文案，每次随机选取一条用于续火花"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="saveMessages"><span class="icon icon-btn" v-html="ICONS.save"></span>保存</el-button>
+                </el-form-item>
+              </el-form>
+            </div>
+          </section>
+
+          <!-- 定时设置 -->
+          <section v-show="tab === 'settings'">
+            <div class="card">
+              <h2>定时设置</h2>
+              <el-form label-width="150px">
+                <el-form-item label="每天续火花时间">
+                  <el-input v-model="settingsForm.schedule_time" type="time" style="width:160px;"></el-input>
+                </el-form-item>
+                <el-form-item label="时间抖动窗口（分钟）">
+                  <el-input-number v-model="settingsForm.jitter_minutes" :min="0" :max="240"></el-input-number>
+                  <span style="margin-left:8px;color:rgba(61,74,92,0.65);font-size:12px;">设定时间后随机延迟 0～N 分钟执行，避免固定时间点续火花</span>
+                </el-form-item>
+                <el-form-item label="好友间隔（秒）">
+                  <el-input-number v-model="settingsForm.send_gap_min" :min="1" :max="300"></el-input-number>
+                  <span style="margin:0 6px;">至</span>
+                  <el-input-number v-model="settingsForm.send_gap_max" :min="1" :max="300"></el-input-number>
+                </el-form-item>
+                <el-form-item label="每次最多续火花人数">
+                  <el-input-number v-model="settingsForm.max_friends_per_run" :min="0" :max="200"></el-input-number>
+                  <span style="margin-left:8px;color:rgba(61,74,92,0.65);font-size:12px;">0 表示不限制</span>
+                </el-form-item>
+                <el-form-item label="周级采集抖音号">
+                  <el-select v-model="settingsForm.schedule_harvest_day" style="width:160px;">
+                    <el-option v-for="d in harvestDays" :key="d.value" :label="d.label" :value="d.value"></el-option>
+                  </el-select>
+                  <span style="margin-left:8px;color:rgba(61,74,92,0.65);font-size:12px;">固定 03:00 自动采集好友抖音号（creator 页，只读）；建议每周 1 次</span>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="saveSettings"><span class="icon icon-btn" v-html="ICONS.save"></span>保存</el-button>
+                </el-form-item>
+              </el-form>
+            </div>
+          </section>
+
+          <!-- 日志 -->
+          <section v-show="tab === 'logs'">
+            <div class="card">
+              <h2>运行日志</h2>
+              <div class="log-toolbar">
+                <el-button size="small" @click="loadLogs"><span class="icon icon-btn" v-html="ICONS.reload"></span>刷新日志</el-button>
+                <el-checkbox v-model="autoRefresh">自动刷新</el-checkbox>
+              </div>
+              <pre class="log-pre">{{ logs || '暂无日志' }}</pre>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <el-dialog v-model="tokenDialog" title="访问令牌" width="360px" :close-on-click-modal="false" :show-close="false">
+      <p style="margin-top:0;color:#606266;font-size:13px;">请输入部署时生成的访问令牌（保存在服务器 .env 文件中）。</p>
+      <el-input v-model="tokenInput" placeholder="访问令牌" show-password @keyup.enter="saveToken"></el-input>
+      <template #footer>
+        <el-button type="primary" @click="saveToken">确定</el-button>
+      </template>
+    </el-dialog>
+
+  </div>
+
+  <script src="/static/vendor/vue.global.prod.js"></script>
+  <script src="/static/vendor/element-plus.full.min.js"></script>
+  <script src="/static/vendor/axios.min.js"></script>
+  <script>
+    const { createApp, ref, reactive, onMounted, onUnmounted, nextTick, computed } = Vue;
+
+    const app = createApp({
+      setup() {
+        const ICONS = {
+  dashboard: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M924.8 385.6a446.7 446.7 0 00-96-142.4 446.7 446.7 0 00-142.4-96C631.1 123.8 572.5 112 512 112s-119.1 11.8-174.4 35.2a446.7 446.7 0 00-142.4 96 446.7 446.7 0 00-96 142.4C75.8 440.9 64 499.5 64 560c0 132.7 58.3 257.7 159.9 343.1l1.7 1.4c5.8 4.8 13.1 7.5 20.6 7.5h531.7c7.5 0 14.8-2.7 20.6-7.5l1.7-1.4C901.7 817.7 960 692.7 960 560c0-60.5-11.9-119.1-35.2-174.4zM761.4 836H262.6A371.12 371.12 0 01140 560c0-99.4 38.7-192.8 109-263 70.3-70.3 163.7-109 263-109 99.4 0 192.8 38.7 263 109 70.3 70.3 109 163.7 109 263 0 105.6-44.5 205.5-122.6 276zM623.5 421.5a8.03 8.03 0 00-11.3 0L527.7 506c-18.7-5-39.4-.2-54.1 14.5a55.95 55.95 0 000 79.2 55.95 55.95 0 0079.2 0 55.87 55.87 0 0014.5-54.1l84.5-84.5c3.1-3.1 3.1-8.2 0-11.3l-28.3-28.3zM490 320h44c4.4 0 8-3.6 8-8v-80c0-4.4-3.6-8-8-8h-44c-4.4 0-8 3.6-8 8v80c0 4.4 3.6 8 8 8zm260 218v44c0 4.4 3.6 8 8 8h80c4.4 0 8-3.6 8-8v-44c0-4.4-3.6-8-8-8h-80c-4.4 0-8 3.6-8 8zm12.7-197.2l-31.1-31.1a8.03 8.03 0 00-11.3 0l-56.6 56.6a8.03 8.03 0 000 11.3l31.1 31.1c3.1 3.1 8.2 3.1 11.3 0l56.6-56.6c3.1-3.1 3.1-8.2 0-11.3zm-458.6-31.1a8.03 8.03 0 00-11.3 0l-31.1 31.1a8.03 8.03 0 000 11.3l56.6 56.6c3.1 3.1 8.2 3.1 11.3 0l31.1-31.1c3.1-3.1 3.1-8.2 0-11.3l-56.6-56.6zM262 530h-80c-4.4 0-8 3.6-8 8v44c0 4.4 3.6 8 8 8h80c4.4 0 8-3.6 8-8v-44c0-4.4-3.6-8-8-8z\" /></svg>",
+  message: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M464 512a48 48 0 1096 0 48 48 0 10-96 0zm200 0a48 48 0 1096 0 48 48 0 10-96 0zm-400 0a48 48 0 1096 0 48 48 0 10-96 0zm661.2-173.6c-22.6-53.7-55-101.9-96.3-143.3a444.35 444.35 0 00-143.3-96.3C630.6 75.7 572.2 64 512 64h-2c-60.6.3-119.3 12.3-174.5 35.9a445.35 445.35 0 00-142 96.5c-40.9 41.3-73 89.3-95.2 142.8-23 55.4-34.6 114.3-34.3 174.9A449.4 449.4 0 00112 714v152a46 46 0 0046 46h152.1A449.4 449.4 0 00510 960h2.1c59.9 0 118-11.6 172.7-34.3a444.48 444.48 0 00142.8-95.2c41.3-40.9 73.8-88.7 96.5-142 23.6-55.2 35.6-113.9 35.9-174.5.3-60.9-11.5-120-34.8-175.6zm-151.1 438C704 845.8 611 884 512 884h-1.7c-60.3-.3-120.2-15.3-173.1-43.5l-8.4-4.5H188V695.2l-4.5-8.4C155.3 633.9 140.3 574 140 513.7c-.4-99.7 37.7-193.3 107.6-263.8 69.8-70.5 163.1-109.5 262.8-109.9h1.7c50 0 98.5 9.7 144.2 28.9 44.6 18.7 84.6 45.6 119 80 34.3 34.3 61.3 74.4 80 119 19.4 46.2 29.1 95.2 28.9 145.8-.6 99.6-39.7 192.9-110.1 262.7z\" /></svg>",
+  clock: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z\" /><path d=\"M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z\" /></svg>",
+  file: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0042 42h216v494zM504 618H320c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8zM312 490v48c0 4.4 3.6 8 8 8h384c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H320c-4.4 0-8 3.6-8 8z\" /></svg>",
+  reload: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M909.1 209.3l-56.4 44.1C775.8 155.1 656.2 92 521.9 92 290 92 102.3 279.5 102 511.5 101.7 743.7 289.8 932 521.9 932c181.3 0 335.8-115 394.6-276.1 1.5-4.2-.7-8.9-4.9-10.3l-56.7-19.5a8 8 0 00-10.1 4.8c-1.8 5-3.8 10-5.9 14.9-17.3 41-42.1 77.8-73.7 109.4A344.77 344.77 0 01655.9 829c-42.3 17.9-87.4 27-133.8 27-46.5 0-91.5-9.1-133.8-27A341.5 341.5 0 01279 755.2a342.16 342.16 0 01-73.7-109.4c-17.9-42.4-27-87.4-27-133.9s9.1-91.5 27-133.9c17.3-41 42.1-77.8 73.7-109.4 31.6-31.6 68.4-56.4 109.3-73.8 42.3-17.9 87.4-27 133.8-27 46.5 0 91.5 9.1 133.8 27a341.5 341.5 0 01109.3 73.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.6 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c-.1-6.6-7.8-10.3-13-6.2z\" /></svg>",
+  key: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M608 112c-167.9 0-304 136.1-304 304 0 70.3 23.9 135 63.9 186.5L255.8 713.6l-62.3-62.3a8.19 8.19 0 00-11.4 0l-39.8 39.8a8.19 8.19 0 000 11.4l62.3 62.3-44.9 44.9-62.3-62.3a8.19 8.19 0 00-11.4 0l-39.8 39.8a8.19 8.19 0 000 11.4l110.3 111.2c3.1 3.1 8.2 3.1 11.3 0l253.6-253.6A304.1 304.1 0 00608 720c167.9 0 304-136.1 304-304S775.9 112 608 112m161.2 465.2C726.2 620.3 668.9 644 608 644s-118.2-23.7-161.2-66.8C403.7 534.2 380 476.9 380 416s23.7-118.2 66.8-161.2c43-43.1 100.3-66.8 161.2-66.8s118.2 23.7 161.2 66.8c43.1 43 66.8 100.3 66.8 161.2s-23.7 118.2-66.8 161.2\" /></svg>",
+  upload: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M400 317.7h73.9V656c0 4.4 3.6 8 8 8h60c4.4 0 8-3.6 8-8V317.7H624c6.7 0 10.4-7.7 6.3-12.9L518.3 163a8 8 0 00-12.6 0l-112 141.7c-4.1 5.3-.4 13 6.3 13zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z\" /></svg>",
+  cloudUpload: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M518.3 459a8 8 0 00-12.6 0l-112 141.7a7.98 7.98 0 006.3 12.9h73.9V856c0 4.4 3.6 8 8 8h60c4.4 0 8-3.6 8-8V613.7H624c6.7 0 10.4-7.7 6.3-12.9L518.3 459z\" /><path d=\"M811.4 366.7C765.6 245.9 648.9 160 512.2 160S258.8 245.8 213 366.6C127.3 389.1 64 467.2 64 560c0 110.5 89.5 200 199.9 200H304c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8h-40.1c-33.7 0-65.4-13.4-89-37.7-23.5-24.2-36-56.8-34.9-90.6.9-26.4 9.9-51.2 26.2-72.1 16.7-21.3 40.1-36.8 66.1-43.7l37.9-9.9 13.9-36.6c8.6-22.8 20.6-44.1 35.7-63.4a245.6 245.6 0 0152.4-49.9c41.1-28.9 89.5-44.2 140-44.2s98.9 15.3 140 44.2c19.9 14 37.5 30.8 52.4 49.9 15.1 19.3 27.1 40.7 35.7 63.4l13.8 36.5 37.8 10C846.1 454.5 884 503.8 884 560c0 33.1-12.9 64.3-36.3 87.7a123.07 123.07 0 01-87.6 36.3H720c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h40.1C870.5 760 960 670.5 960 560c0-92.7-63.1-170.7-148.6-193.3z\" /></svg>",
+  play: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z\" /><path d=\"M719.4 499.1l-296.1-215A15.9 15.9 0 00398 297v430c0 13.1 14.8 20.5 25.3 12.9l296.1-215a15.9 15.9 0 000-25.8zm-257.6 134V390.9L628.5 512 461.8 633.1z\" /></svg>",
+  experiment: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M512 472a40 40 0 1080 0 40 40 0 10-80 0zm367 352.9L696.3 352V178H768v-68H256v68h71.7v174L145 824.9c-2.8 7.4-4.3 15.2-4.3 23.1 0 35.3 28.7 64 64 64h614.6c7.9 0 15.7-1.5 23.1-4.3 33-12.7 49.4-49.8 36.6-82.8zM395.7 364.7V180h232.6v184.7L719.2 600c-20.7-5.3-42.1-8-63.9-8-61.2 0-119.2 21.5-165.3 60a188.78 188.78 0 01-121.3 43.9c-32.7 0-64.1-8.3-91.8-23.7l118.8-307.5zM210.5 844l41.7-107.8c35.7 18.1 75.4 27.8 116.6 27.8 61.2 0 119.2-21.5 165.3-60 33.9-28.2 76.3-43.9 121.3-43.9 35 0 68.4 9.5 97.6 27.1L813.5 844h-603z\" /></svg>",
+  contacts: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M594.3 601.5a111.8 111.8 0 0029.1-75.5c0-61.9-49.9-112-111.4-112s-111.4 50.1-111.4 112c0 29.1 11 55.5 29.1 75.5a158.09 158.09 0 00-74.6 126.1 8 8 0 008 8.4H407c4.2 0 7.6-3.3 7.9-7.5 3.8-50.6 46-90.5 97.2-90.5s93.4 40 97.2 90.5c.3 4.2 3.7 7.5 7.9 7.5H661a8 8 0 008-8.4c-2.8-53.3-32-99.7-74.7-126.1zM512 578c-28.5 0-51.7-23.3-51.7-52s23.2-52 51.7-52 51.7 23.3 51.7 52-23.2 52-51.7 52zm416-354H768v-56c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v56H548v-56c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v56H328v-56c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v56H96c-17.7 0-32 14.3-32 32v576c0 17.7 14.3 32 32 32h832c17.7 0 32-14.3 32-32V256c0-17.7-14.3-32-32-32zm-40 568H136V296h120v56c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-56h148v56c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-56h148v56c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-56h120v496z\" /></svg>",
+  save: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M893.3 293.3L730.7 130.7c-7.5-7.5-16.7-13-26.7-16V112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V338.5c0-17-6.7-33.2-18.7-45.2zM384 184h256v104H384V184zm456 656H184V184h136v136c0 17.7 14.3 32 32 32h320c17.7 0 32-14.3 32-32V205.8l136 136V840zM512 442c-79.5 0-144 64.5-144 144s64.5 144 144 144 144-64.5 144-144-64.5-144-144-144zm0 224c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z\" /></svg>",
+  checkSquare: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M433.1 657.7a31.8 31.8 0 0051.7 0l210.6-292c3.8-5.3 0-12.7-6.5-12.7H642c-10.2 0-19.9 4.9-25.9 13.3L459 584.3l-71.2-98.8c-6-8.3-15.6-13.3-25.9-13.3H315c-6.5 0-10.3 7.4-6.5 12.7l124.6 172.8z\" /><path d=\"M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zm-40 728H184V184h656v656z\" /></svg>",
+  safety: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M866.9 169.9L527.1 54.1C523 52.7 517.5 52 512 52s-11 .7-15.1 2.1L157.1 169.9c-8.3 2.8-15.1 12.4-15.1 21.2v482.4c0 8.8 5.7 20.4 12.6 25.9L499.3 968c3.5 2.7 8 4.1 12.6 4.1s9.2-1.4 12.6-4.1l344.7-268.6c6.9-5.4 12.6-17 12.6-25.9V191.1c.2-8.8-6.6-18.3-14.9-21.2zM810 654.3L512 886.5 214 654.3V226.7l298-101.6 298 101.6v427.6zm-405.8-201c-3-4.1-7.8-6.6-13-6.6H336c-6.5 0-10.3 7.4-6.5 12.7l126.4 174a16.1 16.1 0 0026 0l212.6-292.7c3.8-5.3 0-12.7-6.5-12.7h-55.2c-5.1 0-10 2.5-13 6.6L468.9 542.4l-64.7-89.1z\" /></svg>",
+  fire: "<svg viewBox=\"64 64 896 896\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M834.1 469.2A347.49 347.49 0 00751.2 354l-29.1-26.7a8.09 8.09 0 00-13 3.3l-13 37.3c-8.1 23.4-23 47.3-44.1 70.8-1.4 1.5-3 1.9-4.1 2-1.1.1-2.8-.1-4.3-1.5-1.4-1.2-2.1-3-2-4.8 3.7-60.2-14.3-128.1-53.7-202C555.3 171 510 123.1 453.4 89.7l-41.3-24.3c-5.4-3.2-12.3 1-12 7.3l2.2 48c1.5 32.8-2.3 61.8-11.3 85.9-11 29.5-26.8 56.9-47 81.5a295.64 295.64 0 01-47.5 46.1 352.6 352.6 0 00-100.3 121.5A347.75 347.75 0 00160 610c0 47.2 9.3 92.9 27.7 136a349.4 349.4 0 0075.5 110.9c32.4 32 70 57.2 111.9 74.7C418.5 949.8 464.5 959 512 959s93.5-9.2 136.9-27.3A348.6 348.6 0 00760.8 857c32.4-32 57.8-69.4 75.5-110.9a344.2 344.2 0 0027.7-136c0-48.8-10-96.2-29.9-140.9z\" /></svg>",
+};
+
+        const tab = ref('overview');
+        const navItems = [
+          { name: 'overview', label: '概览', icon: 'dashboard' },
+          { name: 'friends', label: '好友与消息', icon: 'message' },
+          { name: 'settings', label: '定时设置', icon: 'clock' },
+          { name: 'logs', label: '运行日志', icon: 'file' },
+        ];
+        const token = ref(localStorage.getItem('ds_token') || '');
+        const status = reactive({ state_file_exists: false, session_status: 'unknown', running: false, last_run: null, next_run: null, history_count: 0, auth_required: true });
+        const sessionTag = computed(() => {
+          switch (status.session_status) {
+            case 'ok': return { type: 'success', text: '登录正常' };
+            case 'expired': return { type: 'danger', text: '凭证已过期' };
+            case 'partial': return { type: 'warning', text: '部分成功' };
+            case 'failed': return { type: 'danger', text: '续火花失败' };
+            default: return { type: 'info', text: '状态未知' };
+          }
+        });
+        const config = reactive({ schedule_time: '21:00', jitter_minutes: 30, send_gap_min: 6, send_gap_max: 12, max_friends_per_run: 20, friends: [], messages: [], auto_run_enabled: true, allow_first_message: false, schedule_harvest_day: 'mon' });
+        const settingsForm = reactive({ schedule_time: '21:00', jitter_minutes: 30, send_gap_min: 6, send_gap_max: 12, max_friends_per_run: 20, auto_run_enabled: true, allow_first_message: false, schedule_harvest_day: 'mon' });
+        const harvestDays = [
+          { value: 'mon', label: '周一' }, { value: 'tue', label: '周二' }, { value: 'wed', label: '周三' },
+          { value: 'thu', label: '周四' }, { value: 'fri', label: '周五' }, { value: 'sat', label: '周六' }, { value: 'sun', label: '周日' },
+          { value: 'off', label: '关闭' },
+        ];
+        const messagesText = ref('');
+        const logs = ref('');
+        const autoRefresh = ref(false);
+        const uploadFile = ref(null);
+        const contacts = ref([]);
+        const contactsAt = ref('');
+        const contactsError = ref('');
+        const contactsFetching = ref(false);
+        const ledger = ref([]);
+        const ledgerAt = ref('');
+        const ledgerError = ref('');
+        const ledgerChanged = ref(false);
+        const manualName = ref('');
+        const ledgerSelectedCount = computed(() => ledger.value.filter((e) => e.selected).length);
+        const ledgerCreatorOnlyCount = computed(() => ledger.value.filter((e) => e.creator_only).length);
+        const ledgerNoConvCount = computed(() => ledger.value.filter((e) => e.no_consumer_conversation).length);
+        const pendingSend = ref([]);
+        const pendingSendCount = computed(() => pendingSend.value.length);
+        const pendingSendNames = computed(() => {
+          if (!pendingSend.value.length) return '暂无待发送（勾选后自动更新）';
+          return pendingSend.value.map((p) => p.display_name + (p.send_channel === 'creator' ? '（creator）' : '')).join('、');
+        });
+        function ledgerRowClass({ row }) {
+          return row.no_consumer_conversation ? 'creator-only-row' : '';
+        }
+        // 勾选的排前面（按勾选顺序 selected_order，先勾的在前；其余保持原顺序）
+        // selected_order 随勾选保存到台账，重启后置顶顺序不丢
+        const ledgerSorted = computed(() => {
+          const arr = [...ledger.value];
+          arr.sort((a, b) => {
+            const sa = a.selected ? 1 : 0;
+            const sb = b.selected ? 1 : 0;
+            if (sa !== sb) return sb - sa;
+            if (sa) return (a.selected_order ?? 1e9) - (b.selected_order ?? 1e9);
+            return 0;
+          });
+          return arr;
+        });
+        // 勾选变化：新勾选的排到已勾选列表末尾（分配新序号），取消则清空序号
+        function onSelectChange(row) {
+          if (row.selected) {
+            const max = ledger.value.reduce((m, e) => Math.max(m, e.selected_order || 0), 0);
+            row.selected_order = max + 1;
+          } else {
+            row.selected_order = null;
+          }
+          markLedgerChanged();
+        }
+        const harvestConfirm = ref(false);
+        const harvesting = ref(false);
+        const harvestLast = ref(null);
+        let logTimer = null;
+
+        const api = axios.create({ baseURL: '/api', timeout: 900000 });
+        api.interceptors.request.use((cfg) => {
+          if (token.value) cfg.headers['X-Auth-Token'] = token.value;
+          return cfg;
+        });
+        api.interceptors.response.use(
+          (r) => r,
+          (err) => {
+            if (err.response && err.response.status === 401) { tokenDialog.value = true; }
+            return Promise.reject(err);
+          }
+        );
+
+
+
+        function fmt(iso) {
+          if (!iso) return '';
+          const d = new Date(iso);
+          return isNaN(d) ? iso : d.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        async function loadStatus() {
+          try {
+            const r = await api.get('/status');
+            Object.assign(status, r.data);
+            if (r.data.auth_required && !token.value) { /* auth handled by 401 */ }
+          } catch (e) { /* 401 handled by interceptor */ }
+        }
+        async function loadConfig() {
+          try {
+            const r = await api.get('/config');
+            Object.assign(config, r.data);
+            Object.assign(settingsForm, r.data);
+            messagesText.value = (r.data.messages || []).join('\n');
+          } catch (e) { /* handled */ }
+        }
+        async function loadLedger() {
+          try {
+            const r = await api.get('/ledger');
+            ledger.value = r.data.entries || [];
+            pendingSend.value = r.data.pending_send || [];
+            ledgerAt.value = r.data.contacts_at || '';
+            ledgerError.value = r.data.contacts_error || '';
+            harvesting.value = !!r.data.harvesting;
+            harvestLast.value = r.data.harvest_last || null;
+            ledgerChanged.value = false;
+          } catch (e) { /* handled */ }
+        }
+        async function startHarvest() {
+          harvestConfirm.value = false;
+          try {
+            const r = await api.post('/ledger/harvest-creator');
+            if (!r.data.started) return;
+            ElementPlus.ElMessage.info('正在采集抖音号，请稍候（约 1～2 分钟）…');
+            harvesting.value = true;
+            for (let i = 0; i < 80; i++) {
+              await new Promise((r2) => setTimeout(r2, 3000));
+              await loadLedger();
+              if (!harvesting.value) break;
+            }
+            if (harvesting.value) ElementPlus.ElMessage.warning('采集超时，请稍后刷新查看');
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '采集启动失败');
+          }
+        }
+        function markLedgerChanged() { ledgerChanged.value = true; }
+        async function saveLedgerSelection() {
+          try {
+            const r = await api.put('/ledger', { entries: ledger.value.map((e) => ({ display_name: e.display_name, selected: !!e.selected, selected_order: e.selected_order ?? null })) });
+            await loadLedger();
+            const parts = [`更新 ${r.data.updated || 0} 项`];
+            if (r.data.added) parts.push(`新增 ${r.data.added} 项`);
+            ElementPlus.ElMessage.success('勾选已保存（' + parts.join('，') + '）');
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '保存失败');
+          }
+        }
+        async function addManual() {
+          const name = manualName.value.trim();
+          if (!name) return;
+          try {
+            const maxOrder = ledger.value.reduce((m, e) => Math.max(m, e.selected_order || 0), 0);
+            await api.put('/ledger', { entries: [{ display_name: name, selected: true, selected_order: maxOrder + 1 }] });
+            manualName.value = '';
+            await loadLedger();
+            ElementPlus.ElMessage.success('已添加并勾选：' + name);
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '添加失败');
+          }
+        }
+        async function loadContacts() {
+          try {
+            const r = await api.get('/contacts');
+            contacts.value = r.data.contacts || [];
+            contactsAt.value = r.data.contacts_at || '';
+            contactsError.value = r.data.contacts_error || '';
+            contactsFetching.value = !!r.data.fetching;
+          } catch (e) { /* handled */ }
+        }
+        // 兼容保留：旧版联系人接口仍可用（fetchContacts 后台账由后端自动合并）
+        async function fetchContacts() {
+          try {
+            await api.post('/contacts/fetch');
+            contactsFetching.value = true;
+            ElementPlus.ElMessage.info('正在同步联系人列表，请稍候…');
+            for (let i = 0; i < 80; i++) {
+              await new Promise((r) => setTimeout(r, 3000));
+              await loadContacts();
+              if (!contactsFetching.value) break;
+            }
+            await loadLedger();
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '获取失败');
+          }
+        }
+        async function loadLogs() {
+          try {
+            const r = await api.get('/logs');
+            logs.value = r.data.logs;
+          } catch (e) { /* handled */ }
+        }
+        async function loadAll() {
+          await loadStatus();
+          await loadConfig();
+          await loadContacts();
+          await loadLedger();
+          await loadLogs();
+        }
+
+        function buildConfigPayload(extra) {
+          return { config: Object.assign({}, config, settingsForm, {
+            messages: messagesText.value.split('\n').map((s) => s.trim()).filter(Boolean),
+          }, extra || {}) };
+        }
+        async function saveMessages() {
+          try {
+            await api.put('/config', buildConfigPayload());
+            await loadConfig();
+            ElementPlus.ElMessage.success('消息模板已保存');
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '保存失败');
+          }
+        }
+        async function saveSettings() {
+          try {
+            await api.put('/config', buildConfigPayload({ schedule_time: settingsForm.schedule_time }));
+            await loadConfig();
+            await loadStatus();
+            ElementPlus.ElMessage.success('定时设置已保存');
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '保存失败');
+          }
+        }
+
+        async function waitForRunFinish(maxSeconds) {
+          const start = Date.now();
+          while (Date.now() - start < maxSeconds * 1000) {
+            await new Promise((r) => setTimeout(r, 5000));
+            await loadStatus();
+            if (!status.running) return;
+          }
+          ElementPlus.ElMessage.warning('等待超时，任务可能仍在后台运行');
+        }
+        async function triggerRun(dry) {
+          if (!dry) {
+            if (!ledger.value.length) await loadLedger(); // 概览页首次进入时台账可能尚未加载，先拉取
+            const names = ledger.value.filter((e) => e.selected).map((e) => e.display_name);
+            if (!names.length) {
+              ElementPlus.ElMessage.warning('未勾选任何好友，本次不会续火花');
+              return;
+            }
+            const shown = names.length > 10 ? names.slice(0, 10).join('、') + ' …等共 ' + names.length + ' 人' : names.join('、');
+            try {
+              await ElementPlus.ElMessageBox.confirm(
+                `本次将真实续火花 ${names.length} 人：<br><b style="word-break:break-all;">${shown}</b><br>续火花后无法撤回，确认继续？`,
+                '确认真实续火花',
+                { type: 'warning', confirmButtonText: '确认续火花', cancelButtonText: '取消', dangerouslyUseHTMLString: true }
+              );
+            } catch (e) {
+              return; // 用户取消
+            }
+          }
+          try {
+            const r = await api.post('/run', { dry });
+            if (r.data.started) {
+              ElementPlus.ElMessage.info(dry ? '模拟运行已启动' : '续火花任务已启动');
+              await loadStatus();
+              await waitForRunFinish(1200);
+              await loadLogs();
+            }
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '启动失败');
+          }
+        }
+
+        function onFileChange(file) { uploadFile.value = file.raw || null; }
+        function onFileRemove() { uploadFile.value = null; }
+        async function uploadState() {
+          if (!uploadFile.value) return;
+          try {
+            const fd = new FormData();
+            fd.append('file', uploadFile.value);
+            const r = await api.post('/upload-state', fd);
+            ElementPlus.ElMessage.success('登录凭证已就绪（' + r.data.size + ' 字节）');
+            uploadFile.value = null;
+            await loadStatus();
+          } catch (e) {
+            ElementPlus.ElMessage.error(e.response?.data?.detail || '上传失败');
+          }
+        }
+
+        onMounted(async () => {
+          await loadAll();
+          logTimer = setInterval(() => {
+            loadStatus();
+            if (autoRefresh.value) loadLogs();
+          }, 20000);
+        });
+        onUnmounted(() => { if (logTimer) clearInterval(logTimer); });
+
+        const tokenDialog = ref(false);
+        const tokenInput = ref(token.value);
+        function showTokenDialog() { tokenInput.value = token.value; tokenDialog.value = true; }
+        function saveToken() {
+          token.value = tokenInput.value.trim();
+          localStorage.setItem('ds_token', token.value);
+          tokenDialog.value = false;
+          loadAll();
+        }
+
+        return {
+          tab, navItems, status, sessionTag, ICONS, config, settingsForm, messagesText, logs, autoRefresh, uploadFile,
+          contacts, contactsAt, contactsError, contactsFetching,
+          ledger, ledgerSorted, ledgerAt, ledgerError, ledgerChanged, manualName, ledgerSelectedCount, ledgerCreatorOnlyCount, ledgerNoConvCount,
+          pendingSend, pendingSendCount, pendingSendNames,
+          ledgerRowClass,
+          harvestConfirm, harvesting, harvestLast, harvestDays,
+          tokenDialog, tokenInput, showTokenDialog, saveToken,
+          fmt, loadAll, loadLogs, loadContacts, loadLedger, fetchContacts,
+          markLedgerChanged, onSelectChange, saveLedgerSelection, addManual, startHarvest, saveMessages, saveSettings, triggerRun,
+          onFileChange, onFileRemove, uploadState,
+        };
+      },
+    });
+
+    app.use(ElementPlus);
+    app.mount('#app');
+  </script>
+</body>
+</html>
